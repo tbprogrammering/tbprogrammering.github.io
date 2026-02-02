@@ -3,7 +3,7 @@ body {
     background-color: #f4f7f6;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    padding: 10px;
 }
 
 .container {
@@ -92,17 +92,20 @@ button:hover { background-color: #218838; }
     position: absolute;
     top: 20px;
     left: 20px;
-    max-width: 300px;
+    max-width: 200px;
+    height: auto;
 }
 
-@media (max-width: 400px) {
-    h1 {
-        font-size: 1.5rem; /* Gör rubriken lite mindre */
+@media (max-width: 768px) {
+    .logo {
+        position: static; 
+        display: block;
+        margin: 30px auto;
+        max-width: 300px;
     }
-    .card {
-        padding: 1rem; /* Minskar marginalerna inuti kortet */
-    }
-    input {
-        font-size: 16px; /* Förhindrar att iPhone zoomar in vid fokus */
+    
+    .container {
+        position: relative; 
+        padding-top: 20px;
     }
 }
