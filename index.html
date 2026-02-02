@@ -8,7 +8,19 @@
 </head>
 <body>
     <div class="container">
-        <?xml version="1.0" encoding="utf-8"?>
+        <h1>Formeltränaren</h1>
+        <div id="game-card" class="card">
+            <div class="input-group"><label>Storhet</label><input type="text" id="input-storhet"></div>
+            <div class="input-group"><label>Beteckning storhet</label><input type="text" id="input-b-storhet"></div>
+            <div class="input-group"><label>Enhet</label><input type="text" id="input-enhet"></div>
+            <div class="input-group"><label>Beteckning enhet</label><input type="text" id="input-b-enhet"></div>
+            <button id="check-btn">Kontrollera svar</button>
+            <button id="skip-btn">Hoppa över / Visa svar</button>
+            <button id="next-btn" class="hidden">Nästa formel</button>
+        </div>
+        <div id="feedback" class="feedback hidden"></div>
+
+                <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 27.8.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg class="logo" version="1.1" id="Lager_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 300 140" style="enable-background:new 0 0 300 140;" xml:space="preserve">
@@ -1370,18 +1382,6 @@ BGAAAACqIAADAABQBQEYAACA9Tebzf4/mnWUAMoTTQAAAAAASUVORK5CYII=" transform="matrix(
 	</g>
 </g>
 </svg>
-
-        <h1>Formeltränaren</h1>
-        <div id="game-card" class="card">
-            <div class="input-group"><label>Storhet</label><input type="text" id="input-storhet"></div>
-            <div class="input-group"><label>Beteckning storhet</label><input type="text" id="input-b-storhet"></div>
-            <div class="input-group"><label>Enhet</label><input type="text" id="input-enhet"></div>
-            <div class="input-group"><label>Beteckning enhet</label><input type="text" id="input-b-enhet"></div>
-            <button id="check-btn">Kontrollera svar</button>
-            <button id="skip-btn">Hoppa över / Visa svar</button>
-            <button id="next-btn" class="hidden">Nästa formel</button>
-        </div>
-        <div id="feedback" class="feedback hidden"></div>
     </div>
 
     <script src="data.js"></script>
