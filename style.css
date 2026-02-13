@@ -10,6 +10,7 @@ body {
     max-width: 500px;
     width: 100%;
     text-align: center;
+    padding: 10px; /* Minskad padding för att spara plats */
 }
 
 .card {
@@ -105,26 +106,35 @@ button:hover { background-color: #218838; }
     margin-top:20px;
 }
 
-.symbol-container {
-    margin-top: 5px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
 .symbol-btn {
-    background-color: #f8f9fa;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 5px 10px;
+    background-color: #4a5568; /* En mjukare mörkgrå/blåaktig färg */
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;        /* Lite mindre runda hörn */
+    padding: 4px 10px;         /* Betydligt mer kompakt */
     cursor: pointer;
-    font-family: serif; /* Ser mer ut som fysikformler */
-    font-size: 1.1rem;
-    transition: background 0.2s;
+    font-size: 0.95rem;        /* Lagom storlek för att läsas men inte skrika */
+    font-weight: 500;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;           /* Mindre bredd */
 }
 
 .symbol-btn:hover {
-    background-color: #e2e6ea;
+    background-color: #2d3748; /* Blir mörkare vid hovring */
+}
+
+.symbol-btn:active {
+    background-color: #1a202c;
+}
+
+.symbol-container {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;                  /* Tätare mellan knapparna */
 }
 
 /* Göm hjälpen om fältet är låst (dvs när det är ledtråden) */
@@ -132,16 +142,46 @@ input:disabled + #symbol-helper {
     display: none;
 }
 
+/* Mobil-specifika justeringar */
 @media (max-width: 768px) {
-    .logo {
-        position: static; 
-        display: block;
-        margin: 30px auto;
-        max-width: 300px;
+    body {
+        padding: 5px; /* Minimal padding mot kanten */
     }
-    
-    .container {
-        position: relative; 
-        padding-top: 20px;
+
+    h1 {
+        font-size: 1.2rem; /* Mycket mindre rubrik */
+        margin: 5px 0;    /* Minimalt avstånd */
+    }
+
+    #status-bar {
+        font-size: 0.85rem; /* Mindre text för Nivå | Framsteg */
+        margin-bottom: 10px !important;
+        background-color: #fff; /* Ger lite kontrast */
+        padding: 5px;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .card {
+        padding: 15px; /* Kompaktare kort */
+    }
+
+    .input-group {
+        margin-bottom: 10px; /* Mindre avstånd mellan fälten */
+    }
+
+    .input-group label {
+        font-size: 0.8rem; /* Mindre etiketter */
+        margin-bottom: 2px;
+    }
+
+    input {
+        padding: 8px; /* Tunnare inputfält */
+        font-size: 16px; /* Viktigt: 16px förhindrar auto-zoom i iOS */
+    }
+
+    .logo {
+        max-width: 60px; /* Ännu mindre logga på mobil */
+        margin: 5px auto 10px; /* Tightare placering */
     }
 }

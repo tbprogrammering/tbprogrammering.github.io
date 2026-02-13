@@ -22,35 +22,42 @@ function normalize(text) {
         .replace(/\s/g, ''); 
 }
 
-// --- FUNKTION FÖR ATT SKAPA SYMBOL-KNAPPARNA ---
-function createSymbolHelper() {
-    const helperContainer = document.getElementById('symbol-helper');
-    helperContainer.innerHTML = ""; // Rensa först
+// Funktion för att skapa hjälpkrafter för symboler
+function updateSymbolHelpers() {
+    // Hjälpfunktion för att hitta unika specialtecken i en kolumn
+    const getUniqueSpecialSymbols = (key) => {
+        const symbols = formulaData.map(f => f[key]);
+        // Vi filtrerar ut de som innehåller tecken utanför a-z, A-Z, 0-9 och vanliga tecken
+        const specialSymbols = symbols.filter(s => /[^a-zA-Z0-9\/\s\-\(\)]/.test(s));
+        return [...new Set(specialSymbols)];
+    };
 
-    // Hämta alla unika beteckningar från hela din data.js
-    // Vi filtrerar bort de som är vanliga bokstäver (valfritt) eller bara tar alla grekiska/special
-    const allSymbols = [...new Set(formulaData.map(f => f.bStorhet))];
+    const renderButtons = (containerId, inputId, symbols) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        
+        // Om fältet är låst (ledtråd), rita inga knappar
+        if (document.getElementById(inputId).disabled) return;
 
-    allSymbols.forEach(symbol => {
-        // Vi skapar bara knappar för de som faktiskt innehåller specialtecken 
-        // eller är svåra att skriva (t.ex. ρ, η, Ω eller nedsänkta tecken)
-        // Om du vill ha ALLA symboler, ta bort if-satsen nedan.
-        if (/[^a-zA-Z0-9]/.test(symbol)) { 
+        symbols.forEach(symbol => {
             const btn = document.createElement('button');
             btn.className = 'symbol-btn';
             btn.textContent = symbol;
-            btn.type = "button"; // Förhindra form-submit
-            
+            btn.type = "button";
             btn.onclick = () => {
-                const input = document.getElementById('input-b-storhet');
-                if (!input.disabled) {
-                    input.value = symbol; // Skriver in symbolen i rutan
-                    input.focus();
-                }
+                const input = document.getElementById(inputId);
+                input.value = symbol;
+                input.focus();
+                // Trigga en visuell uppdatering så eleven ser att de fyllt i något
+                input.style.backgroundColor = "white"; 
             };
-            helperContainer.appendChild(btn);
-        }
-    });
+            container.appendChild(btn);
+        });
+    };
+
+    // Rendera för båda fälten
+    renderButtons('symbol-helper-b-storhet', 'input-b-storhet', getUniqueSpecialSymbols('bStorhet'));
+    renderButtons('symbol-helper-b-enhet', 'input-b-enhet', getUniqueSpecialSymbols('bEnhet'));
 }
 
 function initGame() {
@@ -93,7 +100,7 @@ function initGame() {
         }
     }
     clueIndex = selectedClue;
-    
+
     // Rensa och hantera inputfält som vanligt
     inputs.forEach((input, index) => {
         input.value = "";
@@ -102,13 +109,7 @@ function initGame() {
         // ...
     });
 
-    // Uppdatera symbol-hjälparen så den syns/döljs korrekt
-    createSymbolHelper(); 
-    
-    // Om bStorhet (index 1) är ledtråden, dölj knapparna
-    const helper = document.getElementById('symbol-helper');
-    helper.style.display = (clueIndex === 1) ? "none" : "flex";
-
+   // Standardåterställning av inputfält
     inputs.forEach((input, index) => {
         input.value = "";
         input.disabled = false;
@@ -121,6 +122,9 @@ function initGame() {
             input.style.backgroundColor = "#e9ecef";
         }
     });
+
+    // --- ANROPA SYMBOLHJÄLPAREN HÄR ---
+    updateSymbolHelpers();
 
     document.getElementById('feedback').classList.add('hidden');
     document.getElementById('check-btn').classList.remove('hidden');
