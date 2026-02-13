@@ -77,21 +77,6 @@ function initGame() {
     let possibleClues = [0, 1, 2, 3];
     let selectedClue = possibleClues[Math.floor(Math.random() * possibleClues.length)];
 
-    // Rensa och hantera inputfält som vanligt
-    inputs.forEach((input, index) => {
-        input.value = "";
-        input.disabled = false;
-        input.style.backgroundColor = "white";
-        // ...
-    });
-
-    // Uppdatera symbol-hjälparen så den syns/döljs korrekt
-    createSymbolHelper(); 
-    
-    // Om bStorhet (index 1) är ledtråden, dölj knapparna
-    const helper = document.getElementById('symbol-helper');
-    helper.style.display = (clueIndex === 1) ? "none" : "flex";
-
     // Vi kollar om den valda ledtråden är en enhet (index 2 eller 3)
     if (selectedClue === 2 || selectedClue === 3) {
         const enhetValue = currentFormula.enhet;
@@ -108,7 +93,21 @@ function initGame() {
         }
     }
     clueIndex = selectedClue;
-    // --------------------------------------------
+    
+    // Rensa och hantera inputfält som vanligt
+    inputs.forEach((input, index) => {
+        input.value = "";
+        input.disabled = false;
+        input.style.backgroundColor = "white";
+        // ...
+    });
+
+    // Uppdatera symbol-hjälparen så den syns/döljs korrekt
+    createSymbolHelper(); 
+    
+    // Om bStorhet (index 1) är ledtråden, dölj knapparna
+    const helper = document.getElementById('symbol-helper');
+    helper.style.display = (clueIndex === 1) ? "none" : "flex";
 
     inputs.forEach((input, index) => {
         input.value = "";
