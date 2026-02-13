@@ -8,15 +8,26 @@
 </head>
 <body>
     <div class="container">
-        <h1>Storhetstränaren</h1>
+        <h1>Storhetstränare</h1>
+
+		<div id="status-bar" style="margin-bottom: 15px; font-weight: bold;">
+        	Nivå: <span id="current-level-display">1</span> | 
+        	Framsteg: <span id="progress-display">0/4</span>
+    	</div>
+
         <div id="game-card" class="card">
             <div class="input-group"><label>Storhet</label><input type="text" id="input-storhet"></div>
-            <div class="input-group"><label>Beteckning storhet</label><input type="text" id="input-b-storhet"></div>
+			<div class="input-group">
+				<label>Beteckning storhet</label>
+				<input type="text" id="input-b-storhet">
+				<div id="symbol-helper" class="symbol-container"></div>
+			</div>
             <div class="input-group"><label>Enhet</label><input type="text" id="input-enhet"></div>
             <div class="input-group"><label>Beteckning enhet</label><input type="text" id="input-b-enhet"></div>
             <button id="check-btn">Kontrollera svar</button>
             <button id="skip-btn">Hoppa över / Visa svar</button>
-            <button id="next-btn" class="hidden">Nästa storhet</button>
+            <button id="next-btn" class="hidden">Nästa formel</button>
+			<button id="reset-progress">Nollställ alla framsteg</button>
         </div>
         <div id="feedback" class="feedback hidden"></div>
 
@@ -1388,6 +1399,3 @@ BGAAAACqIAADAABQBQEYAACA9Tebzf4/mnWUAMoTTQAAAAAASUVORK5CYII=" transform="matrix(
     <script src="script.js"></script>
 </body>
 </html>
-
-
-

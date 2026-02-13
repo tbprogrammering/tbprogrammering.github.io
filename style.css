@@ -96,6 +96,42 @@ button:hover { background-color: #218838; }
     height: auto;
 }
 
+#reset-progress {
+    background:none;
+    border:none;
+    color:gray;
+    font-size:10px;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+.symbol-container {
+    margin-top: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.symbol-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: serif; /* Ser mer ut som fysikformler */
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.symbol-btn:hover {
+    background-color: #e2e6ea;
+}
+
+/* Göm hjälpen om fältet är låst (dvs när det är ledtråden) */
+input:disabled + #symbol-helper {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .logo {
         position: static; 
