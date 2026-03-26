@@ -5,7 +5,7 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Starta från toppen för att undvika scroll på mobil */
+    align-items: flex-start;
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
@@ -22,36 +22,27 @@ body {
     position: relative;
 }
 
-/* --- RUBRIKER OCH STATUS --- */
-h1 {
-    color: #1a202c;
-    margin-bottom: 0px;
-    font-size: 1.8rem;
-}
-
+/* --- STATUSRAD (Nivå & Framsteg) --- */
 #status-bar {
     display: flex;
-    flex-direction: column;
-    align-items:end;
-    margin-bottom: 0px;
-    padding: 2px;
-    font-family: 'Segoe UI', Roboto, sans-serif;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
     font-size: 0.95rem;
     color: #4a5568;
 }
 
-/* Gör etiketterna (Nivå/Framsteg) lite tunnare och värdena fetare */
-#status-bar span {
-    display: flex;
-    gap: 5px;
-}
-
 #status-bar b {
-    margin-left: 5px; /* Ger luft mellan texten och siffran */
+    margin-left: 5px;
     color: #2d3748;
     font-weight: 700;
 }
-/* --- INPUT-GRUPPER OCH ETIKETTER --- */
+
+/* --- INPUT-GRUPPER --- */
 .input-group {
     margin-bottom: 15px;
     text-align: left;
@@ -80,60 +71,55 @@ input,
     margin: 0;
     outline: none;
     transition: all 0.2s;
-    display: block; /* Basläge */
 }
 
-/* Specifikt för ord (Storhet & Enhet) */
+/* Vanliga textfält (Storhet & Enhet) */
 input {
     padding: 0 12px;
     line-height: 43px;
     font-family: Arial, sans-serif;
-    font-style: normal;
 }
 
-/* Specifikt för beteckningar (B-storhet & B-enhet) */
+/* Beteckningsfält (Editable Divs) */
 .editable-input {
-    display: flex; /* Flex för att kunna centrera <sub> vertikalt */
-    align-items: center;
+    display: flex;
+    align-items: center;      /* Vertikal centrering av text */
+    justify-content: flex-start;
     padding: 0 12px;
     cursor: text;
     white-space: nowrap;
     overflow: hidden;
     font-family: "Times New Roman", Times, serif;
     font-style: italic;
+    line-height: 1.2;
 }
 
-/* --- TILLSTÅND (LEDTRÅD / FEL / RÄTT) --- */
-input:disabled,
-.editable-input[contenteditable="false"] {
-    background-color: #e9ecef !important;
-    color: #495057 !important;
-    cursor: not-allowed;
-    border-color: #ccc;
+/* Fix för hoppande markör i tom ruta */
+.editable-input:empty:before {
+    content: "\200b"; /* Zero-width space ger baslinje */
+    display: inline-block;
 }
 
-.correct-flash {
-    border-color: #28a745 !important;
-    background-color: #f0fff4 !important;
-}
-
-.wrong-flash {
-    border-color: #dc3545 !important;
-    background-color: #fff5f5 !important;
-}
-
-/* --- NEDSÄNKT TEXT (sub) I RUTOR OCH KNAPPAR --- */
-.editable-input sub,
-.symbol-btn sub {
+/* Nedsänkt text (sub) */
+.editable-input sub {
     vertical-align: baseline;
     position: relative;
     bottom: -0.35em;
     font-size: 0.7em;
     font-style: normal;
     line-height: 0;
+    pointer-events: none; /* Gör att man inte klickar "i" sub-taggen */
 }
 
-/* --- SYMBOLKNAPPAR (HJÄLPARE) --- */
+/* --- TILLSTÅND --- */
+input:disabled,
+.editable-input[contenteditable="false"] {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+    cursor: not-allowed;
+}
+
+/* --- SYMBOLKNAPPAR --- */
 .symbol-container {
     margin-top: 6px;
     display: flex;
@@ -144,96 +130,53 @@ input:disabled,
 
 .symbol-btn {
     background-color: #4a5568;
-    color: #ffffff;
+    color: white;
     border: none;
     border-radius: 4px;
     padding: 4px 10px;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: 500;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-width: 35px;
     height: 32px;
-    transition: background 0.2s;
 }
 
-.symbol-btn:hover {
-    background-color: #2d3748;
-}
-
-/* --- KNAPPAR (KONTROLLERA / NÄSTA / HOPPA ÖVER) --- */
+/* --- HUVUDKNAPPAR --- */
 .button-container {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: 30px; /* Mer luft ovanför knapparna */
+    margin-top: 30px;
 }
 
-/* Huvudknappen: KONTROLLERA SVAR */
-#check-btn {
-    width: 100%;
-    padding: 18px;            /* Riktigt rejäl höjd */
-    background-color: #007bff; 
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.2rem;        /* Större och tydligare text */
-    font-weight: 800;         /* Extra fet */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 6px 0 #0056b3; /* "3D-effekt" med mörkare botten */
-    position: relative;
-    margin-bottom: 6px;       /* Plats för skuggan */
-}
-
-#check-btn:hover {
-    background-color: #0069d9;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 0 #0056b3;
-}
-
-#check-btn:active {
-    transform: translateY(4px);  /* Trycks ned när man klickar */
-    box-shadow: 0 2px 0 #0056b3; /* Skuggan minskar vid klick */
-}
-
-#skip-btn {
-    width: 100%;
-    padding: 10px;
-    background: none;
-    border: 2px solid #6c757d;
-    color: #6c757d;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 10px;
-}
-
-#skip-btn:hover {
-    background-color: #f8fafc;
-    color: #495057;
-    border-color: #495057;
-}
-
-#next-btn {
+#check-btn, #next-btn {
     width: 100%;
     padding: 18px;
-    background-color: #28a745;
-    color: white;
     border: none;
     border-radius: 12px;
     font-size: 1.2rem;
     font-weight: 800;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 6px 0 #1e7e34;
     transition: all 0.1s;
+    position: relative;
+}
+
+#check-btn {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 6px 0 #0056b3;
+}
+
+#check-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #0056b3;
+}
+
+#next-btn {
+    background-color: #28a745;
+    color: white;
+    box-shadow: 0 6px 0 #1e7e34;
 }
 
 #next-btn:active {
@@ -241,59 +184,25 @@ input:disabled,
     box-shadow: 0 2px 0 #1e7e34;
 }
 
-#reset-progress {
-    margin-top: 30px;
+#skip-btn {
     background: none;
-    border: none;
-    color: #a0aec0;
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 0.8rem;
-    text-decoration: underline;
 }
 
-.feedback {
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 6px;
-    font-weight: bold;
-}
+.feedback { margin-top: 15px; padding: 10px; border-radius: 6px; font-weight: bold; }
 .feedback.correct { background-color: #d4edda; color: #155724; }
 .feedback.wrong { background-color: #f8d7da; color: #721c24; }
-.hidden { display: none; }
+.hidden { display: none !important; }
 
-.logo {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    max-width: 130px;
-    height: auto;
-    opacity: 0.8;
-}
+#reset-progress { margin-top: 30px; background: none; border: none; color: #a0aec0; cursor: pointer; text-decoration: underline; }
 
-/* --- MOBILANPASSNING (MEDIA QUERIES) --- */
+/* --- MOBIL --- */
 @media (max-width: 768px) {
-    body { padding: 5px; }
-    
-    .container { 
-        padding: 15px; 
-        margin-top: 5px;
-    }
-
-    h1 { font-size: 1.3rem; margin: 5px 0; }
-
-    #status-bar { margin-bottom: 10px; padding: 5px; }
-
-    input, .editable-input {
-        height: 40px;
-        font-size: 1rem !important;
-    }
-
-    .input-group { margin-bottom: 10px; }
-
-    .logo {
-        position: static;
-        display: block;
-        margin: 10px auto 0;
-        max-width: 60px;
-    }
+    input, .editable-input { height: 40px; }
+    #check-btn, #next-btn { padding: 15px; font-size: 1.1rem; }
 }
