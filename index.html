@@ -10,22 +10,22 @@
     <div class="container">
         <h1>Storhetstränare</h1>
 
-		<div id="status-bar" style="margin-bottom: 15px; font-weight: bold;">
-        	Nivå: <span id="current-level-display">1</span> | 
-        	Framsteg: <span id="progress-display">0/4</span>
-    	</div>
+		<div id="status-bar">
+			<span id="current-level-display"></span>
+			<span id="progress-display"></span>
+		</div>
 
         <div id="game-card" class="card">
             <div class="input-group"><label>Storhet</label><input type="text" id="input-storhet"></div>
 			<div class="input-group">
 				<label>Beteckning storhet</label>
-				<input type="text" id="input-b-storhet">
+				<div id="input-b-storhet" class="editable-input" contenteditable="true"></div>
 				<div id="symbol-helper-b-storhet" class="symbol-container"></div>
 			</div>
             <div class="input-group"><label>Enhet</label><input type="text" id="input-enhet"></div>
             <div class="input-group">
 				<label>Beteckning enhet</label>
-				<input type="text" id="input-b-enhet">
+				<div id="input-b-enhet" class="editable-input" contenteditable="true"></div>
 				<div id="symbol-helper-b-enhet" class="symbol-container"></div>
 			</div>
             <button id="check-btn">Kontrollera svar</button>
