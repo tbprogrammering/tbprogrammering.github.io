@@ -82,16 +82,71 @@ input, .editable-input {
     z-index: 5;
 }
 
-.button-container { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
-
-.primary-btn {
-    padding: 18px; border: none; border-radius: 12px; font-weight: 800;
-    text-transform: uppercase; cursor: pointer;
+/* --- KNAPPAR MED TRYCK-EFFEKT --- */
+.button-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    margin-top: 25px; 
 }
 
-#check-btn { background: #007bff; color: white; box-shadow: 0 5px 0 #0056b3; }
-#next-btn { background: #28a745; color: white; box-shadow: 0 5px 0 #1e7e34; }
+.primary-btn {
+    padding: 18px; 
+    border: none; 
+    border-radius: 12px; 
+    font-weight: 800;
+    text-transform: uppercase; 
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.05s, box-shadow 0.05s; /* Snabb respons vid klick */
+}
 
+/* Blå knapp (Kontrollera) */
+#check-btn { 
+    background: #007bff; 
+    color: white; 
+    box-shadow: 0 5px 0 #0056b3; 
+}
+
+#check-btn:active { 
+    transform: translateY(4px); /* Flyttar ner knappen */
+    box-shadow: 0 1px 0 #0056b3; /* Minskar skuggan så den ser "intryckt" ut */
+}
+
+/* Grön knapp (Nästa) */
+#next-btn { 
+    background: #28a745; 
+    color: white; 
+    box-shadow: 0 5px 0 #1e7e34; 
+}
+
+#next-btn:active { 
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #1e7e34; 
+}
+
+/* Gul/Orange stil för Hoppa över när den används som "Visa svar" */
+.secondary-btn { 
+    background: white; 
+    border: 2px solid #cbd5e0; 
+    color: #718096; 
+    padding: 12px; 
+    border-radius: 10px; 
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.1s;
+}
+
+.secondary-btn:active {
+    background-color: #f7fafc;
+    transform: translateY(2px);
+}
+
+/* Förhindra att text markeras när man klickar snabbt */
+button {
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
 #skip-btn { background: none; border: 2px solid #cbd5e0; color: #718096; padding: 10px; border-radius: 10px; cursor: pointer; }
 
 .symbol-container { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px; }
