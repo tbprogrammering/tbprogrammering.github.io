@@ -7,6 +7,7 @@ const formulaData = [
     { storhet: "sträcka", bStorhet: "s", enhet: "meter", bEnhet: "m", level: 2 },
     { storhet: "tid", bStorhet: "t", enhet: "sekund", bEnhet: "s", level: 2 },
     { storhet: "acceleration", bStorhet: "a", enhet: "meter/sekundkvadrat", bEnhet: "m/s²", level: 2 },
+    { storhet: "kraftmoment", bStorhet: "M", enhet: "newtonmeter", bEnhet: "Nm", level: 2 },
     { storhet: "energi", bStorhet: "E", enhet: "joule", bEnhet: "J", level: 3 },
     { storhet: "arbete", bStorhet: "W", enhet: "joule", bEnhet: "J", level: 3 },
     { storhet: "effekt", bStorhet: "P", enhet: "watt", bEnhet: "W", level: 3 },
