@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Storhetstränare</title>
+    <title>Storhetstränaren</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-		<div id="status-bar">
-			<div class="status-left">
-				<h1>Storhetstränaren</h1>
-			</div>
-			<div class="status-right">
-				<div id="current-level-display"></div>
-				<div id="progress-display"></div>
-			</div>
-		</div>
+        <div id="status-bar">
+            <div class="status-left">
+                <h1>Storhetstränaren</h1>
+            </div>
+            <div class="status-right">
+                <div id="current-level-display"></div>
+                <div id="progress-display"></div>
+            </div>
+        </div>
 
         <div class="input-group">
             <label>Storhet:</label>
@@ -45,9 +45,7 @@
             </div>
             <div id="symbol-helper-b-enhet" class="symbol-container"></div>
         </div>
-
-        <div id="feedback" class="feedback hidden"></div>
-
+        
         <div class="button-container">
             <button id="check-btn" class="primary-btn">Kontrollera svar</button>
             <button id="next-btn" class="primary-btn hidden">Nästa fråga</button>
@@ -55,6 +53,8 @@
         </div>
 
         <button id="reset-progress">Nollställ alla framsteg</button>
+
+        <div id="feedback" class="feedback hidden"></div>
     </div>
 
     <script src="data.js"></script>
