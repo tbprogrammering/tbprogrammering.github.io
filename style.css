@@ -18,45 +18,46 @@ body {
 
 /* --- RUBRIK --- */
 h1 {
-    font-size: 1.8rem;
+    /* clamp(min, preferens, max) */
+    font-size: clamp(1.1rem, 4vw, 1.6rem); 
     color: #2d3748;
-    margin-bottom: 20px;
-    margin-top: 0;
+    margin: 0;
     font-weight: 800;
     letter-spacing: -0.5px;
+    white-space: nowrap; /* Hindrar rubriken från att radbrytas */
 }
 
 /* --- STATUS & LAYOUT --- */
 #status-bar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    margin-bottom: 15px;
+    align-items: center; /* Centrerar rubrik vs stats vertikalt */
+    padding: 15px;
+    margin-bottom: 25px;
+    gap: 10px;
 }
 
 .status-right {
-    text-align: right; /* Skickar texten till höger */
+    text-align: right;
     display: flex;
-    flex-direction: column; /* Staplar Nivå och Framsteg */
-    gap: 2px;
+    flex-direction: column;
+    justify-content: center;
+    min-width: fit-content;
 }
 
 #current-level-display {
-    font-size: 0.85rem;
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
     font-weight: 700;
     color: #4a5568;
     text-transform: uppercase;
+    line-height: 1.2;
 }
 
 #progress-display {
-    font-size: 0.95rem;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
     color: #718096;
     font-weight: 600;
-}
-
-#status-bar b {
-    color: #2d3748;
+    line-height: 1.2;
 }
 
 .input-group { margin-bottom: 15px; text-align: left; }
@@ -156,3 +157,13 @@ input { padding: 0 12px; }
 .feedback.wrong { background: #f8d7da; color: #721c24; }
 
 #reset-progress { background: none; border: none; color: #a0aec0; cursor: pointer; margin-top: 20px; text-decoration: underline; font-size: 0.8rem; }
+
+/* --- EXTRA MOBIL-ANPASSNING --- */
+@media (max-width: 400px) {
+    #status-bar {
+        padding: 10px;
+    }
+    h1 {
+        letter-spacing: -1px; /* Sparar lite plats på de allra minsta skärmarna */
+    }
+}
