@@ -11,15 +11,15 @@ const inputs = [
 ];
 const keys = ['storhet', 'bStorhet', 'enhet', 'bEnhet'];
 
+// --- HJÄLPFUNKTIONER ---
+
 function normalize(text, isSymbol = false) {
     if (!text) return "";
     let processed = String(text).trim();
+    // Gör om specialtecken till siffror för säkrare jämförelse (m³ -> m3)
     processed = processed.replace(/²/g, '2').replace(/³/g, '3');
-    if (!isSymbol) {
-        return processed.toLowerCase().replace(/\s/g, '');
-    } else {
-        return processed.replace(/\s/g, '');
-    }
+    if (!isSymbol) return processed.toLowerCase().replace(/\s/g, '');
+    return processed.replace(/\s/g, '');
 }
 
 function placeCaretAtEnd(el) {
@@ -34,7 +34,32 @@ function placeCaretAtEnd(el) {
     }
 }
 
-// Rensa-knappar logik
+function openModal(type) {
+    const modal = document.getElementById('level-modal');
+    const title = document.getElementById('modal-title');
+    const text = document.getElementById('modal-text');
+    const icon = document.getElementById('modal-icon');
+    const closeBtn = document.getElementById('modal-close-btn');
+    const confirmBtn = document.getElementById('modal-confirm-btn');
+
+    if (type === 'level-up') {
+        icon.textContent = "🏆";
+        title.textContent = "Nivå avklarad!";
+        text.textContent = `Snyggt jobbat! Du har nu låst upp nivå ${userLevel}. Nu blandar vi gamla och nya utmaningar.`;
+        closeBtn.textContent = "Fortsätt";
+        confirmBtn.classList.add('hidden');
+    } else if (type === 'reset') {
+        icon.textContent = "⚠️";
+        title.textContent = "Nollställ framsteg?";
+        text.textContent = "Vill du verkligen börja om från början? All din historik försvinner.";
+        closeBtn.textContent = "Avbryt";
+        confirmBtn.classList.remove('hidden');
+    }
+    modal.classList.remove('hidden');
+}
+
+// --- RENSA-LOGIK ---
+
 document.querySelectorAll('.clear-input-btn').forEach(btn => {
     const target = document.getElementById(btn.getAttribute('data-target'));
     target.addEventListener('input', () => {
@@ -43,6 +68,7 @@ document.querySelectorAll('.clear-input-btn').forEach(btn => {
     });
     btn.addEventListener('click', () => {
         target.innerHTML = ""; target.focus(); btn.classList.add('hidden');
+        target.classList.remove('field-correct', 'field-wrong', 'field-skipped');
     });
 });
 
@@ -52,6 +78,7 @@ function updateSymbolHelpers() {
         container.innerHTML = "";
         const symbols = [...new Set(formulaData.map(f => f[key]))];
         symbols.forEach(symbol => {
+            // Skapa knappar för nedsänkt text, potenser eller grekiska tecken
             if (/[_²³]/.test(symbol) || /[^\x00-\x7F]/.test(symbol)) {
                 const btn = document.createElement('button');
                 btn.className = 'symbol-btn';
@@ -71,6 +98,8 @@ function updateSymbolHelpers() {
     renderButtons('symbol-helper-b-enhet', 'input-b-enhet', 'bEnhet');
 }
 
+// --- SPEL-LOGIK ---
+
 function initGame() {
     const available = formulaData.filter(f => f.level <= userLevel);
     const remaining = available.filter(f => !completedInLevel.includes(f.storhet));
@@ -81,10 +110,10 @@ function initGame() {
     if (remaining.length === 0 && available.length > 0) {
         const nextExist = formulaData.some(f => f.level === userLevel + 1);
         if (nextExist) {
-            alert(`Nivå ${userLevel} klar! Repetitionsläge.`);
             userLevel++;
             completedInLevel = [];
             saveProgress();
+            openModal('level-up');
             return initGame();
         }
     }
@@ -93,15 +122,21 @@ function initGame() {
     clueIndex = Math.floor(Math.random() * 4);
 
     inputs.forEach((input, index) => {
-        input.classList.remove('field-correct', 'field-wrong');
-        input.innerHTML = ""; if (input.tagName === "INPUT") input.value = "";
+        input.classList.remove('field-correct', 'field-wrong', 'field-skipped');
+        input.innerHTML = ""; 
+        if (input.tagName === "INPUT") input.value = "";
         
         if (index === clueIndex) {
+            // Sätt in ledtråden och markera den som grön direkt
             let val = currentFormula[keys[index]];
             input.setAttribute('contenteditable', 'false');
-            if (input.tagName === "INPUT") { input.value = val; input.disabled = true; }
-            else { input.innerHTML = val.includes('_') ? `${val.split('_')[0]}<sub>${val.split('_')[1]}</sub>` : val; }
-            input.style.backgroundColor = "#f1f5f9";
+            if (input.tagName === "INPUT") { 
+                input.value = val; 
+                input.disabled = true; 
+            } else { 
+                input.innerHTML = val.includes('_') ? `${val.split('_')[0]}<sub>${val.split('_')[1]}</sub>` : val; 
+            }
+            input.classList.add('field-correct');
         } else {
             input.setAttribute('contenteditable', 'true');
             if (input.tagName === "INPUT") input.disabled = false;
@@ -110,7 +145,6 @@ function initGame() {
     });
 
     updateSymbolHelpers();
-    document.getElementById('feedback').classList.add('hidden');
     document.getElementById('check-btn').classList.remove('hidden');
     document.getElementById('skip-btn').classList.remove('hidden');
     document.getElementById('next-btn').classList.add('hidden');
@@ -121,15 +155,13 @@ document.getElementById('check-btn').addEventListener('click', () => {
     let allCorrect = true;
     inputs.forEach((input, index) => {
         if (index !== clueIndex) {
-            // Rensa gamla färger vid nytt försök
-            input.classList.remove('field-correct', 'field-wrong');
-
+            input.classList.remove('field-correct', 'field-wrong', 'field-skipped');
+            
             const raw = (input.tagName === "INPUT" ? input.value : input.innerText).trim();
             const correctValue = currentFormula[keys[index]];
             
-            let altValue = "";
-            if (index === 2) altValue = currentFormula['bEnhet']; 
-            if (index === 3) altValue = currentFormula['enhet'];  
+            // Smart kontroll: Jämför enheter (namn vs beteckning)
+            let altValue = (index === 2) ? currentFormula['bEnhet'] : (index === 3) ? currentFormula['enhet'] : "";
 
             const userAns = normalize(raw, (index === 1 || index === 3));
             const correctAns = normalize(correctValue, true).replace('_','');
@@ -147,17 +179,10 @@ document.getElementById('check-btn').addEventListener('click', () => {
     if (allCorrect) {
         if (!completedInLevel.includes(currentFormula.storhet)) completedInLevel.push(currentFormula.storhet);
         saveProgress();
-        document.getElementById('feedback').textContent = "Snyggt!";
-        document.getElementById('feedback').className = "feedback correct";
-        document.getElementById('feedback').classList.remove('hidden');
         document.getElementById('check-btn').classList.add('hidden');
-        document.getElementById('skip-btn').classList.add('hidden'); // Döljer Hoppa över
+        document.getElementById('skip-btn').classList.add('hidden');
         document.getElementById('next-btn').classList.remove('hidden');
         document.querySelectorAll('.clear-input-btn').forEach(b => b.classList.add('hidden'));
-    } else {
-        document.getElementById('feedback').textContent = "Försök igen!";
-        document.getElementById('feedback').className = "feedback wrong";
-        document.getElementById('feedback').classList.remove('hidden');
     }
 });
 
@@ -172,8 +197,9 @@ document.getElementById('skip-btn').addEventListener('click', () => {
             } else {
                 input.innerHTML = val.includes('_') ? `${val.split('_')[0]}<sub>${val.split('_')[1]}</sub>` : val;
             }
-            input.style.backgroundColor = "#fef3c7";
+            // Markera med gult för att visa att man hoppat över
             input.classList.remove('field-correct', 'field-wrong');
+            input.classList.add('field-skipped');
         }
     });
     document.getElementById('check-btn').classList.add('hidden');
@@ -182,9 +208,17 @@ document.getElementById('skip-btn').addEventListener('click', () => {
     document.querySelectorAll('.clear-input-btn').forEach(b => b.classList.add('hidden'));
 });
 
-document.getElementById('reset-progress').addEventListener('click', () => {
-    if(confirm("Börja om?")) { localStorage.clear(); location.reload(); }
+// Modal-lyssnare
+document.getElementById('modal-close-btn').addEventListener('click', () => {
+    document.getElementById('level-modal').classList.add('hidden');
 });
+
+document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+    localStorage.clear();
+    location.reload();
+});
+
+document.getElementById('reset-progress').addEventListener('click', () => openModal('reset'));
 
 function saveProgress() {
     localStorage.setItem('formulaLevel', userLevel);

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storhetstränaren</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -45,7 +45,7 @@
             </div>
             <div id="symbol-helper-b-enhet" class="symbol-container"></div>
         </div>
-        
+
         <div class="button-container">
             <button id="check-btn" class="primary-btn">Kontrollera svar</button>
             <button id="next-btn" class="primary-btn hidden">Nästa fråga</button>
@@ -53,9 +53,22 @@
         </div>
 
         <button id="reset-progress">Nollställ alla framsteg</button>
-
         <div id="feedback" class="feedback hidden"></div>
     </div>
+
+    <div id="level-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div id="modal-icon" class="modal-icon">🏆</div>
+            <h2 id="modal-title">Nivå avklarad!</h2>
+            <p id="modal-text"></p>
+            <div class="modal-buttons">
+                <button id="modal-confirm-btn" class="primary-btn hidden" style="background: #e53e3e; box-shadow: 0 5px 0 #9b2c2c;">Ja, nollställ</button>
+                <button id="modal-close-btn" class="primary-btn">Fortsätt</button>
+            </div>
+        </div>
+    </div>
+
+    
 
     <script src="data.js"></script>
     <script src="script.js"></script>
