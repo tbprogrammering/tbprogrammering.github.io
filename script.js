@@ -11,15 +11,40 @@ const inputs = [
 ];
 const keys = ['storhet', 'bStorhet', 'enhet', 'bEnhet'];
 
+// Central lista för godkända synonymer per fälttyp
+const synonyms = [
+    ["kilogram/kubikmeter", "kilogram per kubikmeter"],
+    ["meter/sekund", "meter per sekund"],
+    ["meter/sekundkvadrat", "meter per sekundkvadrat"],
+    ["kilogrammeter/sekund", "kilogrammeter per sekund"],
+    ["joule/kilogram", "joule per kilogram"],
+    ["kraftmoment", "vridmoment"]
+];
+
 // --- HJÄLPFUNKTIONER ---
 
 function normalize(text, isSymbol = false) {
     if (!text) return "";
     let processed = String(text).trim();
-    // Gör om specialtecken till siffror för säkrare jämförelse (m³ -> m3)
+    // Normalisera potenser så m³ och m3 matchar
     processed = processed.replace(/²/g, '2').replace(/³/g, '3');
     if (!isSymbol) return processed.toLowerCase().replace(/\s/g, '');
     return processed.replace(/\s/g, '');
+}
+
+// Kollar om två strängar är synonymer (t.ex. "meter per sekund" och "meter/sekund")
+function isSynonym(userStr, correctStr) {
+    const u = normalize(userStr);
+    const c = normalize(correctStr);
+    if (u === c) return true;
+
+    for (const group of synonyms) {
+        const normalizedGroup = group.map(s => normalize(s));
+        if (normalizedGroup.includes(u) && normalizedGroup.includes(c)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function placeCaretAtEnd(el) {
@@ -39,20 +64,17 @@ function openModal(type) {
     const title = document.getElementById('modal-title');
     const text = document.getElementById('modal-text');
     const icon = document.getElementById('modal-icon');
-    const closeBtn = document.getElementById('modal-close-btn');
     const confirmBtn = document.getElementById('modal-confirm-btn');
 
     if (type === 'level-up') {
         icon.textContent = "🏆";
         title.textContent = "Nivå avklarad!";
         text.textContent = `Snyggt jobbat! Du har nu låst upp nivå ${userLevel}. Nu blandar vi gamla och nya utmaningar.`;
-        closeBtn.textContent = "Fortsätt";
         confirmBtn.classList.add('hidden');
     } else if (type === 'reset') {
         icon.textContent = "⚠️";
         title.textContent = "Nollställ framsteg?";
-        text.textContent = "Vill du verkligen börja om från början? All din historik försvinner.";
-        closeBtn.textContent = "Avbryt";
+        text.textContent = "Vill du verkligen börja om? All din historik försvinner.";
         confirmBtn.classList.remove('hidden');
     }
     modal.classList.remove('hidden');
@@ -78,7 +100,6 @@ function updateSymbolHelpers() {
         container.innerHTML = "";
         const symbols = [...new Set(formulaData.map(f => f[key]))];
         symbols.forEach(symbol => {
-            // Skapa knappar för nedsänkt text, potenser eller grekiska tecken
             if (/[_²³]/.test(symbol) || /[^\x00-\x7F]/.test(symbol)) {
                 const btn = document.createElement('button');
                 btn.className = 'symbol-btn';
@@ -127,7 +148,6 @@ function initGame() {
         if (input.tagName === "INPUT") input.value = "";
         
         if (index === clueIndex) {
-            // Sätt in ledtråden och markera den som grön direkt
             let val = currentFormula[keys[index]];
             input.setAttribute('contenteditable', 'false');
             if (input.tagName === "INPUT") { 
@@ -145,11 +165,13 @@ function initGame() {
     });
 
     updateSymbolHelpers();
+    document.getElementById('feedback').classList.add('hidden');
     document.getElementById('check-btn').classList.remove('hidden');
     document.getElementById('skip-btn').classList.remove('hidden');
     document.getElementById('next-btn').classList.add('hidden');
-    document.querySelectorAll('.clear-input-btn').forEach(b => b.classList.add('hidden'));
 }
+
+// --- RÄTTNINGSLOGIKEN ---
 
 document.getElementById('check-btn').addEventListener('click', () => {
     let allCorrect = true;
@@ -157,17 +179,12 @@ document.getElementById('check-btn').addEventListener('click', () => {
         if (index !== clueIndex) {
             input.classList.remove('field-correct', 'field-wrong', 'field-skipped');
             
-            const raw = (input.tagName === "INPUT" ? input.value : input.innerText).trim();
+            const userRaw = (input.tagName === "INPUT" ? input.value : input.innerText).trim();
             const correctValue = currentFormula[keys[index]];
             
-            // Smart kontroll: Jämför enheter (namn vs beteckning)
-            let altValue = (index === 2) ? currentFormula['bEnhet'] : (index === 3) ? currentFormula['enhet'] : "";
-
-            const userAns = normalize(raw, (index === 1 || index === 3));
-            const correctAns = normalize(correctValue, true).replace('_','');
-            const altAns = altValue ? normalize(altValue, true).replace('_','') : null;
-
-            if (userAns === correctAns || (altAns && userAns === altAns) || (userAns === "" && correctValue === "-")) {
+            // LOGIK: Vi kollar BARA mot synonymer för det specifika fältet. 
+            // Vi tillåter INTE korsmatchning mellan t.ex. 'enhet' och 'bEnhet' längre.
+            if (isSynonym(userRaw, correctValue) || (userRaw === "" && correctValue === "-")) {
                 input.classList.add('field-correct');
             } else {
                 input.classList.add('field-wrong');
@@ -179,12 +196,21 @@ document.getElementById('check-btn').addEventListener('click', () => {
     if (allCorrect) {
         if (!completedInLevel.includes(currentFormula.storhet)) completedInLevel.push(currentFormula.storhet);
         saveProgress();
+        document.getElementById('feedback').textContent = "Snyggt!";
+        document.getElementById('feedback').className = "feedback correct";
+        document.getElementById('feedback').classList.remove('hidden');
         document.getElementById('check-btn').classList.add('hidden');
         document.getElementById('skip-btn').classList.add('hidden');
         document.getElementById('next-btn').classList.remove('hidden');
         document.querySelectorAll('.clear-input-btn').forEach(b => b.classList.add('hidden'));
+    } else {
+        document.getElementById('feedback').textContent = "Något är fel, kolla noga!";
+        document.getElementById('feedback').className = "feedback wrong";
+        document.getElementById('feedback').classList.remove('hidden');
     }
 });
+
+// --- ÖVRIGA LISTENERS ---
 
 document.getElementById('next-btn').addEventListener('click', initGame);
 
@@ -192,12 +218,8 @@ document.getElementById('skip-btn').addEventListener('click', () => {
     inputs.forEach((input, index) => {
         if (index !== clueIndex) {
             let val = currentFormula[keys[index]];
-            if (input.tagName === "INPUT") {
-                input.value = val;
-            } else {
-                input.innerHTML = val.includes('_') ? `${val.split('_')[0]}<sub>${val.split('_')[1]}</sub>` : val;
-            }
-            // Markera med gult för att visa att man hoppat över
+            if (input.tagName === "INPUT") input.value = val;
+            else input.innerHTML = val.includes('_') ? `${val.split('_')[0]}<sub>${val.split('_')[1]}</sub>` : val;
             input.classList.remove('field-correct', 'field-wrong');
             input.classList.add('field-skipped');
         }
@@ -205,10 +227,8 @@ document.getElementById('skip-btn').addEventListener('click', () => {
     document.getElementById('check-btn').classList.add('hidden');
     document.getElementById('skip-btn').classList.add('hidden');
     document.getElementById('next-btn').classList.remove('hidden');
-    document.querySelectorAll('.clear-input-btn').forEach(b => b.classList.add('hidden'));
 });
 
-// Modal-lyssnare
 document.getElementById('modal-close-btn').addEventListener('click', () => {
     document.getElementById('level-modal').classList.add('hidden');
 });
