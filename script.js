@@ -11,7 +11,6 @@ const inputs = [
 ];
 const keys = ['storhet', 'bStorhet', 'enhet', 'bEnhet'];
 
-// Central lista för godkända synonymer per fälttyp
 const synonyms = [
     ["kilogram/kubikmeter", "kilogram per kubikmeter"],
     ["meter/sekund", "meter per sekund"],
@@ -26,13 +25,11 @@ const synonyms = [
 function normalize(text, isSymbol = false) {
     if (!text) return "";
     let processed = String(text).trim();
-    // Normalisera potenser så m³ och m3 matchar
     processed = processed.replace(/²/g, '2').replace(/³/g, '3');
     if (!isSymbol) return processed.toLowerCase().replace(/\s/g, '');
     return processed.replace(/\s/g, '');
 }
 
-// Kollar om två strängar är synonymer (t.ex. "meter per sekund" och "meter/sekund")
 function isSynonym(userStr, correctStr) {
     const u = normalize(userStr);
     const c = normalize(correctStr);
@@ -101,6 +98,7 @@ function updateSymbolHelpers() {
         const symbols = [...new Set(formulaData.map(f => f[key]))];
         symbols.forEach(symbol => {
             if (/[_²³]/.test(symbol) || /[^\x00-\x7F]/.test(symbol)) {
+                if (symbol === "-") return; // Skapa aldrig en knapp för saknad enhet
                 const btn = document.createElement('button');
                 btn.className = 'symbol-btn';
                 btn.innerHTML = symbol.includes('_') ? `${symbol.split('_')[0]}<sub>${symbol.split('_')[1]}</sub>` : symbol;
@@ -140,24 +138,49 @@ function initGame() {
     }
 
     currentFormula = remaining.length > 0 ? remaining[Math.floor(Math.random() * remaining.length)] : available[Math.floor(Math.random() * available.length)];
-    clueIndex = Math.floor(Math.random() * 4);
+    
+    // NYTT: Slumpa ett index, men se till att vi INTE väljer ett fält som har värdet "-" som ledtråd
+    let validClueIndices = [];
+    keys.forEach((key, idx) => {
+        if (currentFormula[key] !== "-") {
+            validClueIndices.push(idx);
+        }
+    });
+    clueIndex = validClueIndices[Math.floor(Math.random() * validClueIndices.length)];
 
     inputs.forEach((input, index) => {
         input.classList.remove('field-correct', 'field-wrong', 'field-skipped');
         input.innerHTML = ""; 
         if (input.tagName === "INPUT") input.value = "";
         
-        if (index === clueIndex) {
-            let val = currentFormula[keys[index]];
+        const correctValue = currentFormula[keys[index]];
+
+        // NYTT SPECIALFALL: Om värdet är "-" (t.ex. verkningsgrad saknar enhet), stäng rutan direkt
+        if (correctValue === "-") {
+            input.setAttribute('contenteditable', 'false');
+            if (input.tagName === "INPUT") {
+                input.value = "-";
+                input.disabled = true;
+            } else {
+                input.innerHTML = "-";
+            }
+            input.style.backgroundColor = "#f1f5f9";
+            input.classList.add('field-correct'); // Markera som automatiskt "klar/grön"
+        }
+        // Annars hanterar vi fältet som den slumpade ledtråden
+        else if (index === clueIndex) {
             input.setAttribute('contenteditable', 'false');
             if (input.tagName === "INPUT") { 
-                input.value = val; 
+                input.value = correctValue; 
                 input.disabled = true; 
             } else { 
-                input.innerHTML = val.includes('_') ? `${val.split('_')[0]}<sub>${val.split('_')[1]}</sub>` : val; 
+                input.innerHTML = correctValue.includes('_') ? `${correctValue.split('_')[0]}<sub>${correctValue.split('_')[1]}</sub>` : correctValue; 
             }
             input.classList.add('field-correct');
-        } else {
+            input.style.backgroundColor = "#f1f5f9";
+        } 
+        // Eller som ett öppet fält användaren ska fylla i
+        else {
             input.setAttribute('contenteditable', 'true');
             if (input.tagName === "INPUT") input.disabled = false;
             input.style.backgroundColor = "white";
@@ -171,20 +194,23 @@ function initGame() {
     document.getElementById('next-btn').classList.add('hidden');
 }
 
-// --- RÄTTNINGSLOGIKEN ---
-
 document.getElementById('check-btn').addEventListener('click', () => {
     let allCorrect = true;
     inputs.forEach((input, index) => {
-        if (index !== clueIndex) {
+        // Vi kontrollerar bara de fält som faktiskt är öppna och inte låsta som ledtrådar eller "-" fält
+        const correctValue = currentFormula[keys[index]];
+        if (index !== clueIndex && correctValue !== "-") {
             input.classList.remove('field-correct', 'field-wrong', 'field-skipped');
             
             const userRaw = (input.tagName === "INPUT" ? input.value : input.innerText).trim();
-            const correctValue = currentFormula[keys[index]];
             
-            // LOGIK: Vi kollar BARA mot synonymer för det specifika fältet. 
-            // Vi tillåter INTE korsmatchning mellan t.ex. 'enhet' och 'bEnhet' längre.
-            if (isSynonym(userRaw, correctValue) || (userRaw === "" && correctValue === "-")) {
+            let altValue = (index === 2) ? currentFormula['bEnhet'] : (index === 3) ? currentFormula['enhet'] : "";
+
+            const userAns = normalize(userRaw, (index === 1 || index === 3));
+            const correctAns = normalize(correctValue, true).replace('_','');
+            const altAns = altValue ? normalize(altValue, true).replace('_','') : null;
+
+            if (isSynonym(userRaw, correctValue) || (altAns && isSynonym(userRaw, altValue))) {
                 input.classList.add('field-correct');
             } else {
                 input.classList.add('field-wrong');
@@ -210,16 +236,14 @@ document.getElementById('check-btn').addEventListener('click', () => {
     }
 });
 
-// --- ÖVRIGA LISTENERS ---
-
 document.getElementById('next-btn').addEventListener('click', initGame);
 
 document.getElementById('skip-btn').addEventListener('click', () => {
     inputs.forEach((input, index) => {
-        if (index !== clueIndex) {
-            let val = currentFormula[keys[index]];
-            if (input.tagName === "INPUT") input.value = val;
-            else input.innerHTML = val.includes('_') ? `${val.split('_')[0]}<sub>${val.split('_')[1]}</sub>` : val;
+        const correctValue = currentFormula[keys[index]];
+        if (index !== clueIndex && correctValue !== "-") {
+            if (input.tagName === "INPUT") input.value = correctValue;
+            else input.innerHTML = correctValue.includes('_') ? `${correctValue.split('_')[0]}<sub>${correctValue.split('_')[1]}</sub>` : correctValue;
             input.classList.remove('field-correct', 'field-wrong');
             input.classList.add('field-skipped');
         }
