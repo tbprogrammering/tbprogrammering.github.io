@@ -29,6 +29,8 @@ function normalize(text, isSymbol = false) {
     let processed = String(text).trim();
     processed = processed.replace(/²/g, '2').replace(/³/g, '3');
     
+    processed = processed.replace(/_/g, '');
+    
     // FIXEN: Om det är en symbol/beteckning gör vi den INTE till lowercase.
     // Detta sparar skillnaden på stort V och litet v.
     if (!isSymbol) {
